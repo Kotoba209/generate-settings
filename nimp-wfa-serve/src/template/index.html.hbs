@@ -1,0 +1,269 @@
+<div class="row chart-row">
+  <div class="col col-lg-12 form">
+    <ng-common-panel>
+      <form
+        class="smart-form charts-search-form"
+        novalidate=""
+        #formDir="ngForm"
+      >
+        <fieldset>
+          <div class="row">
+            {{#each queryFormData}}
+              {{#isEqual type "input"}}
+                <section class="col col-2">
+                  <label class="label adorn">{{name}}{{#if isRequire}}<i
+                        class="ng-essential-flag"
+                      >*</i>{{/if}}</label>
+                  <label class="input">
+                    <input
+                      #input
+                      name="{{field}}"
+                      [(ngModel)]="requestParam['{{field}}']"
+                      autocomplete="off"
+                      placeholder="请输入"
+                      inputWithDelete
+                      (clearEvent)="requestParam['{{field}}']=''"
+                      class="input-xs"
+                      type="text"
+                    />
+                  </label>
+                </section>
+              {{/isEqual}}
+              {{#isEqual type "multipleSelect"}}
+                <section class="col col-2">
+                  <label class="label adorn">{{name}}{{#if isRequire}}<i
+                        class="ng-essential-flag"
+                      >*</i>{{/if}}</label>
+                  <ng-drop-down-multi
+                    [(ngModel)]="requestParam['{{field}}Arr']"
+                    [menuData]="menuData"
+                    name="{{field}}"
+                    customClass="input-xs"
+                    [isAllOptionShowAll]="true"
+                    [allOption]="allOption"
+                    [placeholder]="requestParam['{{field}}Arr'] === '' ? '请选择' : ''"
+                  >
+                  </ng-drop-down-multi>
+                </section>
+              {{/isEqual}}
+              {{#isEqual type "select"}}
+                <section class="col col-2">
+                  <label class="label adorn">{{name}}{{#if isRequire}}<i
+                        class="ng-essential-flag"
+                      >*</i>{{/if}}</label>
+                  <ng-drop-down-search
+                    [menuData]="menuData"
+                    [(ngModel)]="requestParam['{{field}}']"
+                    name="{{field}}"
+                    defaultContent="请选择"
+                    customClass="input-xs"
+                  >
+                  </ng-drop-down-search>
+                </section>
+              {{/isEqual}}
+              {{#isEqual type "date"}}
+                <section class="col col-3">
+                  <label class="label adorn">{{name}}{{#if isRequire}}<i
+                        class="ng-essential-flag"
+                      >*</i>{{/if}}</label>
+                  <label
+                    class="input"
+                    style="display: flex; align-items: center"
+                  >
+                    <p-calendar
+                      [(ngModel)]="requestParam['{{field.[0]}}']"
+                      [dataType]="'string'"
+                      name="{{field.[0]}}"
+                      [showIcon]="true"
+                      [monthNavigator]="true"
+                      [yearNavigator]="true"
+                      (ngModelChange)="dateChange($event)"
+                      dateFormat="yy-mm-dd"
+                      readonlyInput="true"
+                      placeholder="开始日期"
+                      inputStyleClass="input-xs showIcon-Input"
+                    >
+                    </p-calendar>
+                    <span style="margin: 0 6px">至</span>
+                    <p-calendar
+                      [(ngModel)]="requestParam['{{field.[1]}}']"
+                      [dataType]="'string'"
+                      name="{{field.[1]}}"
+                      [showIcon]="true"
+                      [monthNavigator]="true"
+                      [yearNavigator]="true"
+                      (ngModelChange)="dateChange($event)"
+                      dateFormat="yy-mm-dd"
+                      readonlyInput="true"
+                      placeholder="结束日期"
+                      inputStyleClass="input-xs showIcon-Input"
+                    >
+                    </p-calendar>
+                  </label>
+                </section>
+              {{/isEqual}}
+            {{/each}}
+
+          </div>
+        </fieldset>
+        <div class="footer">
+          <button type="button" class="btn ng-button-default">
+            <div>查询</div>
+            {{! <ng-template #elseBlock>查询中</ng-template> }}
+          </button>
+          <button type="button" class="btn ng-button-default">重置</button>
+          <button type="button" class="btn ng-button-default">新增</button>
+          <button type="button" class="btn ng-button-default">修改</button>
+          <button type="button" class="btn ng-button-default">删除</button>
+          <button type="button" class="btn ng-button-default">导出</button>
+        </div>
+      </form>
+    </ng-common-panel>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col col-lg-12 table">
+    <ng-common-panel>
+      <div class="ng-pannel-no-border-table">
+        <p-table
+          [(ngModel)]="pagerNewGuests['list']"
+          name="pagerNewGuests"
+          [style]="{ 'text-align': 'center' }"
+          [rows]="20"
+          [rowsPerPageOptions]="[20, 30, 50, 100]"
+          [currPage]="1"
+          [paginator]="true"
+          [totalRecords]="10"
+          (onLazyLoad)="refreshData($event)"
+          scrollable="true"
+          scrollWidth="100%"
+          [(selection)]="selectDate"
+          #pTable
+          [isShowEmptyMessageScroll]="false"
+          resizableColumns="true"
+          styleClass="asm-table-cutom-style"
+          [loading]="loading"
+        >
+          <ng-template pTemplate="colgroup">
+            <colgroup>
+              <col width="30px" />
+              {{#each headData as |outerItem outerIndex|}}
+              {{#each outerItem as |innerItem innerIndex|}}
+                <col width="60px" />
+              {{/each}}
+              {{/each}}
+              {{!-- {{#each headData}}
+                <col width="60px" />
+              {{/each}} --}}
+            </colgroup>
+          </ng-template>
+          <ng-template pTemplate="header">
+            {{#each headData as |outerItem outerIndex|}}
+              <tr>
+                {{#isEqual outerIndex 0}}
+                  <th rowSpan="{{../headData.length}}">
+                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+                  </th>
+                {{/isEqual}}
+                {{#each outerItem as |innerItem innerIndex|}}
+                  <th rowSpan="{{innerItem.rowSpan}}" colSpan="{{innerItem.colSpan}}">{{innerItem.name}}{{@length}}</th>
+                {{/each}}
+                
+              </tr>
+            {{/each}}
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-i="rowIndex">
+            {{!-- <tr>
+              <td>
+                <p-tableCheckbox [value]="item"></p-tableCheckbox>
+              </td> --}}
+          {{#if bodyJsonConfig}}
+            {{#each bodyJsonConfig as |outerItem outerIndex|}}
+              {{#isArray outerItem.list}}
+                {{#each outerItem.list as |innerItem innerIndex|}}
+                  {{#isArray innerItem.list}}
+                    {{#each innerItem.list as |innerInnerItem innerInnerIndex|}}
+                      <!-- TODO 三层嵌套需要自行调整显示-->
+                      <ng-container *ngFor="let item1 of item['{{outerItem.dataName}}']; let j = index">
+                        <ng-container *ngFor="let item2 of item1['{{innerItem.dataName}}']; let k = index">
+                          <tr>
+                          <td>
+                            <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                          </td>
+                          {{#each outerItem.fields}}
+                          <td *ngIf="j === 0 && k === 0" [attr.rowSpan]="computedRowSpan(item)">{{surroundWithCurlyBraces this}}</td>
+                          {{/each}}
+                          {{#each innerItem.fields}}
+                          <td *ngIf="k === 0" [attr.rowSpan]="item1.{{innerItem.dataName}}.length" [attr.colspan]="1">
+                           {{surroundWithCurlyBraces this 'item1'}}
+                          </td>
+                          {{/each}}
+                          {{#each innerInnerItem.fields}}
+                          <td [attr.colspan]="1">
+                           {{surroundWithCurlyBraces this 'item2'}}
+                          </td>
+                          {{/each}}
+                          </tr>
+                        </ng-container>
+                      </ng-container>
+                    {{/each}}
+                    {{else}}
+                    
+                     <!-- TODO 两层嵌套需要自行调整显示 -->
+                     <ng-container *ngFor="let item1 of item['{{outerItem.dataName}}']; let j = index">
+                      <tr>
+                      <td>
+                        <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                      </td>
+                       {{#each outerItem.fields}}
+                         <td *ngIf="j === 0" [attr.rowSpan]="item.{{outerItem.dataName}}.length">{{surroundWithCurlyBraces this}}</td>
+                       {{/each}}
+                       {{#each innerItem.fields}}
+                         <td [attr.colspan]="1">
+                          {{surroundWithCurlyBraces this 'item1'}}
+                         </td>
+                       {{/each}}
+                      </tr>
+                     </ng-container>
+                  {{/isArray}}
+                {{/each}}
+                {{else}}
+                 <!-- TODO -->
+                 <tr>
+                  <td>
+                    <p-tableCheckbox [value]="item"></p-tableCheckbox>
+                  </td>
+                 {{#each outerItem.fields}}
+                  <td [attr.rowSpan]="1" [attr.colspan]="1">
+                    {{surroundWithCurlyBraces this}}
+                  </td>
+                  </tr>
+                 {{/each}}
+              {{/isArray}}
+            {{/each}}
+            {{else}}
+            <tr>
+            {{#each headData.[0] as |outerItem outerIndex|}}
+            {{#if outerItem.children}}
+             <td>
+               <p-tableCheckbox [value]="item"></p-tableCheckbox>
+             </td>
+            {{#each outerItem.children as |innerItem innerIndex|}}
+              <td>{{surroundWithCurlyBraces innerItem.field }}</td>
+            {{/each}}
+            {{else}}
+              <td>
+                <p-tableCheckbox [value]="item"></p-tableCheckbox>
+              </td>
+              <td>{{surroundWithCurlyBraces outerItem.field }}</td>
+            {{/if}}
+            {{/each}}
+            </tr>
+          {{/if}}
+          </ng-template>
+        </p-table>
+      </div>
+    </ng-common-panel>
+  </div>
+</div>

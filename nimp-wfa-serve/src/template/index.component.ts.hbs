@@ -1,0 +1,78 @@
+import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { HttpRequestWrapper } from "ng-commons";
+import {
+  ComponentBaseClass,
+  NGDropDownMultiValues,
+  NGTabPageAssistMediator,
+} from "ng-wfa-component";
+import { RequestParamModel } from './model/request-param.model';
+
+declare var $: any;
+
+@Component({
+  selector: "previews-component",
+  templateUrl: "./previews.component.html",
+  providers: [HttpRequestWrapper],
+})
+export class PreviewsComponent extends ComponentBaseClass
+  implements OnInit, AfterViewInit {
+  constructor(
+    public activatedRoute: ActivatedRoute,
+    public httpRequestWrapper: HttpRequestWrapper,
+    public ngTabPageAssistMediator: NGTabPageAssistMediator
+  ) {
+    super(httpRequestWrapper, ngTabPageAssistMediator, activatedRoute);
+  }
+
+  requestParam: any = new RequestParamModel();
+  allOption: NGDropDownMultiValues = new NGDropDownMultiValues("全部", "ALL");
+  menuData = [];
+  selectDate = [];
+
+  pagerNewGuests = {
+    list: [],
+  };
+
+  loading: boolean;
+
+  ngOnInit() {
+    console.log("<-init->");
+    this.getMockData();
+  }
+
+  ngAfterViewInit() {}
+
+  dateChange(e) {}
+
+  refreshData(e) {}
+
+  getMockData() {
+    this.fetchMockData('mock-serve/getMockData').then((data) => {
+     {{!-- console.log('Fetched data:', data); --}}
+     this.pagerNewGuests.list = data.data;
+    });
+  }
+  async fetchMockData(url) {
+   try {
+     const response = await fetch(url);
+     console.log(response, 'response')
+     const data = await response.json();
+     return data;
+   } catch (error) {
+     console.error('Error fetching data:', error);
+     throw error;
+   }
+  }
+
+  {{#isArray bodyJsonConfig.[0].list.[0].list}}
+  computedRowSpan(list) {
+    let len = 0;
+    list.{{bodyJsonConfig.[0].dataName}}.forEach((item) => {
+      len += item.{{bodyJsonConfig.[0].list.[0].dataName}}.length;
+    });
+    return len;
+  }
+  {{/isArray}}
+
+}

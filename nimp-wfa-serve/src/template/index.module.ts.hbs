@@ -1,0 +1,45 @@
+import { NgModule } from "@angular/core";
+import { PreviewsComponent } from "./index.component";
+import { CommonModule } from "@angular/common";
+import { PreviewsRoutingModule } from "./index.routing.module";
+import { FormsModule } from "@angular/forms";
+import {
+  CalendarModule,
+  ConfirmationService,
+  ConfirmDialogModule,
+  CheckboxModule,
+  NGDimSelectModule,
+  NGDropDownSearchModule,
+  InputWithDeleteDirectiveModule,
+  NGProgressSpinnerModule,
+  NGDictSelectModule,
+  SmartadminWidgetsModule,
+  TableModule,
+  FileUploadModule,
+  NGDropDownMultiModule,
+} from "ng-wfa-component";
+
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    SmartadminWidgetsModule,
+    PreviewsRoutingModule,
+    ConfirmDialogModule,
+    CalendarModule,
+    NGDropDownSearchModule,
+    NGDimSelectModule,
+    NGDictSelectModule,
+    CheckboxModule,
+    InputWithDeleteDirectiveModule,
+    NGProgressSpinnerModule,
+    TableModule,
+    FileUploadModule,
+    NGDropDownMultiModule,
+  ],
+  declarations: [PreviewsComponent],
+  exports: [PreviewsComponent],
+  providers: [ConfirmationService],
+  bootstrap: [],
+})
+export class PreviewsModule {}

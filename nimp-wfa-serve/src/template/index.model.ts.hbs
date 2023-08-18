@@ -1,0 +1,27 @@
+export class RequestParamModel {
+  constructor(
+    {{#each queryFormData }}
+      {{#isEqual type "multipleSelect"}}
+        public {{field}}?: string, // {{ name }}
+        public {{field}}Arr?: string[], // {{ name }}
+        {{else}}
+        public {{field}}?: string, // {{ name }}
+      {{/isEqual}}
+    {{/each}}
+  ) {}
+}
+
+export class ResponseParamModel {
+  constructor(
+    {{#each headData as |outerItem outerIndex|}}
+    {{#each outerItem as |innerItem innerIndex|}}
+    public {{innerItem.field}}?: string, // {{ innerItem.name }}
+    {{#if innerItem.children}}
+      {{#each innerItem.children as |innerInnerItemItem innerInnerItemIndex|}}
+      public {{innerInnerItemItem.field}}?: string, // {{ innerInnerItemItem.name }}
+      {{/each}}
+    {{/if}}
+    {{/each}}
+    {{/each}}
+  ) {}
+}
