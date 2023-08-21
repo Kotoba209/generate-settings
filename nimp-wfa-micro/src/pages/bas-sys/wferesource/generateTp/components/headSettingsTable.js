@@ -34,6 +34,7 @@ const HeadSettingsTable = (props) => {
 
   useImperativeHandle(headRef, () => ({
     getData: () => headFormData,
+    setData: (data) => setHeadFormData(data),
   }));
 
   const edit = (record) => {

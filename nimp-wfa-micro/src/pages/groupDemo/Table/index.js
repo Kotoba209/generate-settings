@@ -1,5 +1,5 @@
 import { connect, KeepAlive /* patchKeepAlive */ } from 'umi';
-import services from '@/services/demo';
+import services from '@/services/index';
 import {
   ActionType,
   FooterToolbar,

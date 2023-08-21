@@ -62,3 +62,75 @@ export const generateRandomId = (length = 10) => {
   }
   return result;
 };
+
+export const formatSettingsData = (data) => {
+  const {
+    queryField,
+    queryName,
+    queryType,
+    queryIsRequire,
+    headField,
+    headName,
+    headRowSpan,
+    headColSpan,
+    childHeadField,
+    childHeadName,
+    childHeadRowSpan,
+    childHeadColSpan,
+    settingsName,
+    configDesc,
+    bodyJsonConfig,
+  } = data;
+  let headData = [];
+  let queryFormData = [];
+  let childHeadData = [];
+  const queryFieldAry = queryField.split(',');
+  const queryNameAry = queryName.split(',');
+  const queryTypeAry = queryType.split(',');
+  const queryIsRequireAry = queryIsRequire.split(',');
+  const headFieldAry = headField.split(',');
+  const headNameAry = headName.split(',');
+  const headRowSpanAry = headRowSpan.split(',');
+  const headColSpanAry = headColSpan.split(',');
+  const childHeadFieldAry = childHeadField.split(',').filter(i => i);
+  const childHeadNameAry = childHeadName.split(',');
+  const childHeadRowSpanAry = childHeadRowSpan.split(',');
+  const childHeadColSpanAry = childHeadColSpan.split(',');
+  queryFieldAry.forEach((_, index) => {
+    queryFormData.push({
+      field: queryFieldAry[index],
+      name: queryNameAry[index],
+      type: queryTypeAry[index],
+      isRequire: queryIsRequireAry[index],
+    });
+  });
+  headFieldAry.forEach((_, index) => {
+    headData.push({
+      field: headFieldAry[index],
+      name: headNameAry[index],
+      rowSpan: headRowSpanAry[index],
+      colSpan: headColSpanAry[index],
+    });
+  });
+  console.log('childHeadFieldAry', childHeadFieldAry)
+  childHeadFieldAry.length > 0 &&
+    childHeadFieldAry.forEach((_, index) => {
+      childHeadData.push({
+        field: childHeadFieldAry[index],
+        name: childHeadNameAry[index],
+        rowSpan: childHeadRowSpanAry[index],
+        colSpan: childHeadColSpanAry[index],
+      });
+    });
+    console.log('childHeadData', childHeadData)
+  if (childHeadData.length > 0) {
+    headData[0].children = childHeadData;
+  }
+  return {
+    headData,
+    queryFormData,
+    bodyJsonConfig,
+    settingsName,
+    configDesc
+  }
+}

@@ -53,6 +53,7 @@ export class PreviewsComponent extends ComponentBaseClass
      this.pagerNewGuests.list = data.data;
     });
   }
+  
   async fetchMockData(url) {
    try {
      const response = await fetch(url);
@@ -74,5 +75,4 @@ export class PreviewsComponent extends ComponentBaseClass
     return len;
   }
   {{/isArray}}
-
 }

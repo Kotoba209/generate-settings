@@ -62,6 +62,7 @@ const QuerySettingsTable = (props) => {
 
   useImperativeHandle(queryRef, () => ({
     getData: () => queryFormData,
+    setData: (data) => setQueryFormData(data),
   }));
 
   const edit = (record) => {

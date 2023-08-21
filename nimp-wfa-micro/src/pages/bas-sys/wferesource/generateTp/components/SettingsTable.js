@@ -133,6 +133,7 @@ const SettingsTable = (props) => {
           dataSource={tableData}
           columns={mergedColumns}
           rowClassName="editable-row"
+          rowKey="field"
           pagination={{
             onChange: cancel,
           }}

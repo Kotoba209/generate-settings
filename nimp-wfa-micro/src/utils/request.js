@@ -9,6 +9,7 @@ import { history } from 'umi';
 
 // 请求 api 前缀
 const API_PREFIX = '/micro-api-prefix/';
+const CUSTOM_PREFIX = '/node-serve';
 // codeMessage 具体根据和后端协商,在详细定义.
 const codeMessage = {
   200: '服务器成功返回请求的数据。',
@@ -68,13 +69,14 @@ const request = extend({
 
 // request拦截器, 携带token.
 request.interceptors.request.use((url, options) => {
-  const nodeServeUrls = ['/setTableParams']
+  const { customPrefix = false, ...rest } = options;
+  const nodeServeUrls = ['/setTableParams', '/getSettingList', '/setSettings']
   // 不携带token的请求数组
   let notCarryTokenArr = [];
   if (notCarryTokenArr.includes(url)) {
     return {
       url,
-      options,
+      rest,
     };
   }
   // 给每个请求带上token 前缀
@@ -82,9 +84,9 @@ request.interceptors.request.use((url, options) => {
     "X-Authorizationtoken": getUserToken(),
     apikey: 'web-user',
   };
-  const prefix = nodeServeUrls.includes(url) ? '/node-serve' : API_PREFIX;
+  const prefix = customPrefix ? '/node-serve' : API_PREFIX;
   return {
-    url: `${prefix}${url}`,
+    url: `${url}`,
     options: { ...options, interceptors: true, headers },
   };
 });
@@ -106,9 +108,9 @@ const getUserToken = () => {
 
 // 封装的get,post,put,delete请求  参数{params ：{}}
 //当涉及下载附件时 参数中需要添加responseType:'blob',getResponse:true
-const get = async (url, parameter) => {
+const get = async (url, parameter, customPrefix = false) => {
   try {
-    const res = await request(url, { method: 'get', ...parameter });
+    const res = await request(url, { method: 'get', ...parameter, customPrefix });
     console.log('res233', res)
     return res;
   } catch (error) {
@@ -116,9 +118,9 @@ const get = async (url, parameter) => {
   }
 };
 
-const deletes = async (url, parameter) => {
+const deletes = async (url, parameter, customPrefix = false) => {
   try {
-    const res = await request(url, { method: 'delete', ...parameter });
+    const res = await request(url, { method: 'delete', ...parameter, customPrefix });
     return res;
   } catch (error) {
     throw error;
@@ -131,11 +133,13 @@ const deletes = async (url, parameter) => {
   requestType: 'form' 控制 'Content-Type': 'application/x-www-form-urlencoded; 为这个
 }
 */
-const post = async (url, data) => {
+const post = async (url, data, customPrefix = false) => {
+  console.log('url', url)
   try {
     const res = await request(url, {
       method: 'post',
       data,
+      customPrefix
     });
     return res;
   } catch (error) {
@@ -143,18 +147,18 @@ const post = async (url, data) => {
   }
 };
 
-const put = async (url, args) => {
+const put = async (url, args, customPrefix = false) => {
   try {
-    const res = await request(url, { method: 'put', ...args });
+    const res = await request(url, { method: 'put', ...args, customPrefix });
     return res;
   } catch (error) {
     throw error;
   }
 };
 
-const patch = async (url, args) => {
+const patch = async (url, args, customPrefix = false) => {
   try {
-    const res = await request(url, { method: 'patch', ...args });
+    const res = await request(url, { method: 'patch', ...args, customPrefix });
     return res;
   } catch (error) {
     throw error;
