@@ -41,7 +41,7 @@
                     customClass="input-xs"
                     [isAllOptionShowAll]="true"
                     [allOption]="allOption"
-                    [placeholder]="requestParam['{{field}}Arr'] === '' ? '请选择' : ''"
+                    [placeholder]="!requestParam['{{field}}Arr'] ? '请选择' : ''"
                   >
                   </ng-drop-down-multi>
                 </section>
@@ -108,14 +108,29 @@
         </fieldset>
         <div class="footer">
           <button type="button" class="btn ng-button-default">
-            <div>查询</div>
-            {{! <ng-template #elseBlock>查询中</ng-template> }}
+            <div *ngIf="!isWait; else elseBlock">查询</div>
+            <ng-template #elseBlock>查询中</ng-template>
           </button>
-          <button type="button" class="btn ng-button-default">重置</button>
-          <button type="button" class="btn ng-button-default">新增</button>
-          <button type="button" class="btn ng-button-default">修改</button>
-          <button type="button" class="btn ng-button-default">删除</button>
-          <button type="button" class="btn ng-button-default">导出</button>
+          <button type="button" [disabled]="isWait" (click)='reset()' class="btn ng-button-default">重置</button>
+          <button type="button" [disabled]="isWait" (click)='goToAddGuest()' class="btn ng-button-default">新增</button>
+          <button type="button" [disabled]="isWait || disableBtn" (click)='goToEditGuest()' class="btn ng-button-default">修改</button>
+          <button type="button" [disabled]="isWait || disableBtn" (click)='removeNewGuest()' class="btn ng-button-default">删除</button>
+          <button type="button" [disabled]="isWait || disableBtn" (click)='export()' class="btn ng-button-default">导出</button>
+          <button type="button" [disabled]="isWait || disableBtn" (click)='templateDownload()' class="btn ng-button-default">模板下载</button>
+          <p-fileUpload
+            name="myfile"
+            [customUpload]="true"
+            multiple="true"
+            [disabled]="isWait"
+            [invalidFileTypeMessageSummary]="'{0}: 无效的文件类型,'"
+            [invalidFileTypeMessageDetail]="'上传失败，文件类型仅支持word文档、excel表格、图片、txt文本'"
+            [invalidFileSizeMessageDetail]="'上传失败，上传的文件大小不能超过{0}！'"
+            [chooseLabel]="'选择文件'"
+            [uploadLabel]="'导入'"
+            [cancelLabel]="'取消'"
+            (uploadHandler)="excelUploaded($event)"
+            accept='application/vnd.ms-excel,application/msword,image/*,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.csv'>
+          </p-fileUpload>
         </div>
       </form>
     </ng-common-panel>
@@ -138,7 +153,7 @@
           (onLazyLoad)="refreshData($event)"
           scrollable="true"
           scrollWidth="100%"
-          [(selection)]="selectDate"
+          [(selection)]="selectData"
           #pTable
           [isShowEmptyMessageScroll]="false"
           resizableColumns="true"
@@ -147,12 +162,15 @@
         >
           <ng-template pTemplate="colgroup">
             <colgroup>
+              {{!-- <col width="30px" /> --}}
+              <!--复选框-->
               <col width="30px" />
-              {{#each headData as |outerItem outerIndex|}}
+              <col *ngFor="let col of cols" [width]="col.width || '60px'" />
+              {{!-- {{#each headData as |outerItem outerIndex|}}
               {{#each outerItem as |innerItem innerIndex|}}
                 <col width="60px" />
               {{/each}}
-              {{/each}}
+              {{/each}} --}}
               {{!-- {{#each headData}}
                 <col width="60px" />
               {{/each}} --}}
@@ -238,7 +256,7 @@
                   <td [attr.rowSpan]="1" [attr.colspan]="1">
                     {{surroundWithCurlyBraces this}}
                   </td>
-                  </tr>
+                  {{!-- </tr> --}}
                  {{/each}}
               {{/isArray}}
             {{/each}}

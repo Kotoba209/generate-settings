@@ -21,6 +21,7 @@ setHandlerBarsHelper();
 
 const webSocketServer = new WebSocketServer({ noServer: true }, { clientKey });
 const initSocket = ({ name, req, socket, head }) => {
+  console.log('name', name)
   webSocketServer.handleUpgrade(req, socket, head, (ws) => {
     ws[clientKey] = name; //添加索引，方便在客户端列表查询某个socket连接
     webSocketServer.addClient(ws);
@@ -29,6 +30,7 @@ const initSocket = ({ name, req, socket, head }) => {
 };
 
 server.on("upgrade", (req, socket, head) => {
+  console.log('req', req)
   //通过http.server过滤数据
   const url = new URL(req.url, `http://${req.headers.host}`);
   const name = url.searchParams.get(clientKey); //获取连接标识
@@ -53,15 +55,19 @@ app.post("/setTableParams", (req, res) => {
   } else if (headData.length > 0) {
     headData = [headData];
   }
-  const isHasDate = queryFormData.findIndex((i) => i.type === "date");
-  if (isHasDate > -1) {
-    queryFormData = queryFormData.map((item) => {
+  const DateTypeIdx = queryFormData.findIndex((i) => i.type === "date");
+  if (DateTypeIdx > -1) {
+    queryFormData = queryFormData.map((item, idx) => {
       // 日期字段
       if (item.type === "date") {
-        item.field = [`${item.field}Start`, `${item.field}End`];
+        // queryFormData.push({...item, field: `${item.field}Begin`});
+        // queryFormData.push({...item, field: `${item.field}End`});
+        item.field = [`${item.field}Begin`, `${item.field}End`];
       }
+      item = {...item, isRequire: item.isRequire == '1'}
       return item;
     });
+    // queryFormData.splice(DateTypeIdx, 1);
   }
   const templateUrl = path.join(__dirname, "template/");
   const templateHtml = fs.readFileSync(
@@ -85,6 +91,7 @@ app.post("/setTableParams", (req, res) => {
     queryFormData,
     headData,
     bodyJsonConfig,
+    arr: [1,2,3]
   });
   const model = handlebars.compile(templateModel)({ queryFormData, headData });
   if (webSocketServer && webSocketServer.ws) {
@@ -174,12 +181,12 @@ app.get("/delSettingByIds", async (req, res) => {
   }
 });
 
-app.listen(3001, () => {
-  console.log("接口 服务开启");
+app.listen(3881, () => {
+  console.log(`接口 服务开启 端口号：${3881}`);
 });
 
 server.listen(port, () => {
-  console.log("websocket 服务开启");
+  console.log(`websocket 服务开启 端口号：${port}`);
 });
 
 //验证url标准

@@ -34,7 +34,7 @@ const HeadSettingsTable = (props) => {
 
   useImperativeHandle(headRef, () => ({
     getData: () => headFormData,
-    setData: (data) => setHeadFormData(data),
+    setData: (data) => setHeadFormData(data.map(i => ({...i, key: generateRandomId()}))),
   }));
 
   const edit = (record) => {
@@ -149,6 +149,12 @@ const HeadSettingsTable = (props) => {
       title: '字段',
       dataIndex: 'field',
       width: '15%',
+      editable: true,
+    },
+    {
+      title: '宽度',
+      dataIndex: 'width',
+      // width: '10%',
       editable: true,
     },
     {

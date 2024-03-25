@@ -37,6 +37,9 @@ const { Header, Content } = Layout;
 
 const isValidJson = (str) => {
   console.log('str', str);
+  if (!str) {
+    return;
+  }
   try {
     let jsonStr = JSON.parse(str);
     if (!Array.isArray(jsonStr)) {
@@ -85,11 +88,12 @@ export default function index() {
   const [bodyJsonConfig, setBodyJsonConfig] = useState('');
   const [saveModalVisible, handleSaveModalVisible] = useState(false);
   const [saveFormValues, setSaveFormValues] = useState({});
+  const [isCopy, setIsCopy] = useState(false);
   const queryFormRef = useRef();
   const headTableRef = useRef();
   const location = useLocation();
-  const { pathname } = location;
-  const id = pathname.split('id=')[1];
+  const { query: { id } } = location;
+  // const id = pathname.split('id=')[1];
 
   useEffect(() => {
     const fetchSettingById = () => {
@@ -119,70 +123,71 @@ export default function index() {
   const generate = () => {
     console.log(queryFormRef.current.getData());
     const queryFormData = queryFormRef.current.getData();
-    // const headData = headTableRef.current.getData();
-    const headData = [
-      {
-        key: '7rjJ8lgYeD',
-        name: '航司',
-        field: 'airline',
-        rowSpan: 1,
-        colSpan: 1,
-        uuid: 'BeSSb0CyUe',
-      },
-      {
-        uuid: 'CKKsqhg3Dq',
-        key: '8h5Ew1kPwt',
-        name: '航班号',
-        field: 'fltNo',
-        rowSpan: 1,
-        colSpan: 1,
-      },
-      {
-        uuid: 'bh56wuon1N',
-        key: 'Hu8PwlQ79Y',
-        name: '到达站',
-        field: 'arrive',
-        rowSpan: 1,
-        colSpan: 1,
-      },
-      {
-        uuid: 'fdxrFypWIQ',
-        key: 'w7JUOnF29Y',
-        name: '出发站',
-        field: 'dep',
-        rowSpan: 1,
-        colSpan: 1,
-      },
-      {
-        uuid: 'vl9kW6DVme',
-        key: 'gxSYk790i2',
-        name: '开始日期',
-        field: 'startDate',
-        rowSpan: 1,
-        colSpan: 1,
-      },
-      {
-        uuid: 'lN5L0uLPTB',
-        key: 'MfykdxjYKn',
-        name: '结束日期',
-        field: 'endDate',
-        rowSpan: 1,
-        colSpan: 1,
-      },
-    ];
+    const headData = headTableRef.current.getData();
+    // const headData = [
+    //   {
+    //     key: '7rjJ8lgYeD',
+    //     name: '航司',
+    //     field: 'airline',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //     uuid: 'BeSSb0CyUe',
+    //   },
+    //   {
+    //     uuid: 'CKKsqhg3Dq',
+    //     key: '8h5Ew1kPwt',
+    //     name: '航班号',
+    //     field: 'fltNo',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //   },
+    //   {
+    //     uuid: 'bh56wuon1N',
+    //     key: 'Hu8PwlQ79Y',
+    //     name: '到达站',
+    //     field: 'arrive',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //   },
+    //   {
+    //     uuid: 'fdxrFypWIQ',
+    //     key: 'w7JUOnF29Y',
+    //     name: '出发站',
+    //     field: 'dep',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //   },
+    //   {
+    //     uuid: 'vl9kW6DVme',
+    //     key: 'gxSYk790i2',
+    //     name: '开始日期',
+    //     field: 'startDate',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //   },
+    //   {
+    //     uuid: 'lN5L0uLPTB',
+    //     key: 'MfykdxjYKn',
+    //     name: '结束日期',
+    //     field: 'endDate',
+    //     rowSpan: 1,
+    //     colSpan: 1,
+    //   },
+    // ];
     if (
       (bodyJsonConfig && !isValidJson(bodyJsonConfig)) ||
       (bodyJsonConfig && !isValidHeadAndConfigBody(headData, bodyJsonConfig))
     ) {
       return;
     }
+    console.log('bodyJsonConfig', bodyJsonConfig)
     request
       .post(
         '/node-serve/setTableParams',
         {
           queryFormData,
           headData,
-          bodyJsonConfig: JSON.parse(bodyJsonConfig),
+          bodyJsonConfig: bodyJsonConfig ? JSON.parse(bodyJsonConfig) : {},
         },
         true,
       )
@@ -198,8 +203,14 @@ export default function index() {
         message.error(err);
       });
   };
+  
+  const copy = () => {
+    handleSaveModalVisible(true);
+    setIsCopy(true);
+  }
 
   const save = (settingsParam) => {
+    let url = '/node-serve/setSettings';
     const { settingsName, configDesc } = settingsParam;
     const queryFormData = queryFormRef.current.getData();
     console.log('bodyJsonConfig', bodyJsonConfig);
@@ -278,8 +289,8 @@ export default function index() {
     let childHeadColSpan = childHead?.map((i) => i.colSpan).join(',');
 
     request
-      .post('/node-serve/setSettings', {
-        // id: id ? id : '',
+      .post(url, {
+        id: id && !isCopy ? id : '',
         queryField,
         queryName,
         queryType,
@@ -313,7 +324,12 @@ export default function index() {
 
   const handleJumpList = () => {
     // history.push('/main/micro-app/portal/list/settings-list;data=233');
-    history.goBack();
+    if (id) {
+      history.goBack();
+      return;
+    }
+    history.push('/main/settings');
+    // window.location.href = '/main/settings';
   };
 
   return (
@@ -331,10 +347,18 @@ export default function index() {
             保存
           </Button>
           {id && (
+            <Button type="primary" onClick={() => copy()} style={{ marginRight: 15 }}>
+              复制
+            </Button>
+          )}
+          <Button type="primary" onClick={() => handleJumpList()} style={{ marginRight: 15 }}>
+            历史配置
+          </Button>
+          {/* {id && (
             <Button type="primary" onClick={() => handleJumpList()}>
               返回
             </Button>
-          )}
+          )} */}
         </Header>
         <Content>
           <Card title="查询表单配置" bordered={false}>

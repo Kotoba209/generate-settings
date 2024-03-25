@@ -4,20 +4,21 @@ import { CommonModule } from "@angular/common";
 import { PreviewsRoutingModule } from "./index.routing.module";
 import { FormsModule } from "@angular/forms";
 import {
-  CalendarModule,
   ConfirmationService,
   ConfirmDialogModule,
   CheckboxModule,
   NGDimSelectModule,
-  NGDropDownSearchModule,
   InputWithDeleteDirectiveModule,
   NGProgressSpinnerModule,
   NGDictSelectModule,
   SmartadminWidgetsModule,
   TableModule,
   FileUploadModule,
-  NGDropDownMultiModule,
 } from "ng-wfa-component";
+import {CalendarModule} from "./../../../custom-shared/component/calendar/calendar";
+import {NGDropDownMultiModule} from '../../../shared/components/custom/ng-drop-dowm-multiSelect/ng-drop-down-multiselect.module';
+import { NGDropDownSearchModule } from '../../../custom-shared/component/ng-drop-dowm-search/ng-drop-down-search.module';
+import { DialogModule } from './../../../custom-shared/component/dialog/dialog';
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import {
     TableModule,
     FileUploadModule,
     NGDropDownMultiModule,
+    DialogModule,
   ],
   declarations: [PreviewsComponent],
   exports: [PreviewsComponent],

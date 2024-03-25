@@ -62,8 +62,9 @@ const QuerySettingsTable = (props) => {
 
   useImperativeHandle(queryRef, () => ({
     getData: () => queryFormData,
-    setData: (data) => setQueryFormData(data),
+    setData: (data) => setQueryFormData(data.map(i => ({...i, key: generateRandomId()}))),
   }));
+  console.log('queryFormData', queryFormData)
 
   const edit = (record) => {
     form.setFieldsValue({
@@ -121,6 +122,7 @@ const QuerySettingsTable = (props) => {
       field: 'airline',
       type: `input`,
       isRequire: 0,
+      width: 60,
     };
     setQueryFormData([...queryFormData, newData]);
   };
@@ -149,6 +151,9 @@ const QuerySettingsTable = (props) => {
       dataIndex: 'isRequire',
       // width: '10%',
       editable: true,
+      render: (_, record) => {
+        return record.isRequire == 1 ? '是' : '否';
+      }
     },
     {
       title: '操作',

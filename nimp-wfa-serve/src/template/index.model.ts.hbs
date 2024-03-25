@@ -2,10 +2,17 @@ export class RequestParamModel {
   constructor(
     {{#each queryFormData }}
       {{#isEqual type "multipleSelect"}}
-        public {{field}}?: string, // {{ name }}
-        public {{field}}Arr?: string[], // {{ name }}
+        public {{field}}Arr?: string, // {{ name }}
+        public {{field}}?: string[], // {{ name }}
         {{else}}
-        public {{field}}?: string, // {{ name }}
+          {{#isArray field}}
+          {{#each field as |item|}}
+        public {{item}}?: string, // {{ name }}
+          {{/each}}
+          {{/isArray}}
+          {{^isArray field}}
+          public {{field}}?: string, // {{ name }}
+          {{/isArray}}
       {{/isEqual}}
     {{/each}}
   ) {}

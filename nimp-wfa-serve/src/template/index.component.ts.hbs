@@ -1,12 +1,23 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { HttpRequestWrapper } from "ng-commons";
+import {
+  DateUtils,
+  HttpRequestWrapper,
+  MessagesConstant,
+  RouteURLParamsUtils,
+  TextUtils,
+  FormView,
+  MSAppConstant,
+  MSBasSysCatalogConstant, BlobMIMETypeConstant, SwitchGWUtils
+} from 'ng-commons';
 import {
   ComponentBaseClass,
   NGDropDownMultiValues,
   NGTabPageAssistMediator,
+  MessageService,
 } from "ng-wfa-component";
 import { RequestParamModel } from './model/request-param.model';
+import {CustomUtils} from '../../../custom-shared/core/utils/custom-utils';
 
 declare var $: any;
 
@@ -18,6 +29,7 @@ declare var $: any;
 export class PreviewsComponent extends ComponentBaseClass
   implements OnInit, AfterViewInit {
   constructor(
+    private messageService: MessageService,
     public activatedRoute: ActivatedRoute,
     public httpRequestWrapper: HttpRequestWrapper,
     public ngTabPageAssistMediator: NGTabPageAssistMediator
@@ -28,13 +40,25 @@ export class PreviewsComponent extends ComponentBaseClass
   requestParam: any = new RequestParamModel();
   allOption: NGDropDownMultiValues = new NGDropDownMultiValues("全部", "ALL");
   menuData = [];
-  selectDate = [];
+  selectData = [];
 
   pagerNewGuests = {
     list: [],
   };
 
   loading: boolean;
+  isWait: boolean;
+  disableBtn: boolean;
+
+  {{#isArray headData}}
+    {{#each headData as |outerItem outerIndex|}}
+  cols = [
+  {{#each outerItem as |innerItem innerIndex|}}
+    { header: "{{innerItem.name}}", field: "{{innerItem.field}}", {{#if innerItem.width}}width: {{innerItem.width}} {{/if}} },
+  {{/each}}
+  ];
+    {{/each}}
+  {{/isArray}}
 
   ngOnInit() {
     console.log("<-init->");
@@ -46,6 +70,95 @@ export class PreviewsComponent extends ComponentBaseClass
   dateChange(e) {}
 
   refreshData(e) {}
+
+  goToAddGuest() {}
+
+  goToEditGuest() {}
+  
+  removeNewGuest() {}
+
+  export() {}
+
+  templateDownload() {}
+
+  excelUploaded(e) {}
+
+  reset() {
+    {{#each queryFormData }}
+      {{#isEqual type "multipleSelect"}}
+    this.requestParam.{{field}} = "ALL";
+        {{else}}
+        {{#isArray field}}
+          {{#each field as |item|}}
+    this.requestParam.{{item}} = "";
+          {{/each}}
+          {{/isArray}}
+          {{^isArray field}}
+    this.requestParam.{{field}} = "";
+          {{/isArray}}
+      {{/isEqual}}
+    {{/each}}
+  }
+
+  setParameter(): boolean {
+    {{#each queryFormData }}
+      {{#isEqual type "multipleSelect"}}
+    this.requestParam.{{field}} = [];
+      {{/isEqual}}
+    {{/each}}
+
+    {{#each queryFormData }}
+      {{#isEqual type "multipleSelect"}}
+    if (!CustomUtils.isNull(this.requestParam.{{field}}Arr)) {
+      if(this.requestParam.{{field}}Arr === 'ALL'){
+          this.requestParam.{{field}} = [];
+      }else {
+          this.requestParam.{{field}} = this.requestParam.{{field}}Arr.split(',');
+      }    
+    }
+      {{/isEqual}}
+    {{/each}}
+
+    {{#each queryFormData }}
+      {{#if isRequire}}
+          {{#isEqual type "multipleSelect"}}
+    if (CustomUtils.isNull(this.requestParam.{{field}}Arr)) {
+      this.messageService.add({
+        severity: MessagesConstant.warn,
+        summary: "",
+        detail: "请选择{{name}}",
+      });
+      return true;
+    } 
+      {{else}}
+          {{#isArray field}}
+          {{#each field as |item|}}
+    if (CustomUtils.isNull(this.requestParam.{{item}})) {
+      this.messageService.add({
+        severity: MessagesConstant.warn,
+        summary: "",
+        detail: "请选择{{name}}",
+      });
+      return true;
+    }
+          {{/each}}
+          {{/isArray}}
+          {{^isArray field}}
+    if (CustomUtils.isNull(this.requestParam.{{field}})) {
+      this.messageService.add({
+        severity: MessagesConstant.warn,
+        summary: "",
+        detail: "请选择{{name}}",
+      });
+      return true;
+    }
+          {{/isArray}}
+      {{/isEqual}}
+      {{/if}}
+      
+    {{/each}}
+    return false;
+  }
 
   getMockData() {
     this.fetchMockData('mock-serve/getMockData').then((data) => {
